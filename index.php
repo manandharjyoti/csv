@@ -88,8 +88,17 @@ class Merge
 		// // var_dump($this->obj_b);
 		// $merged = array_merge($a, $b);
 
-		 echo "<pre>";
-		 var_dump($final, 'have fun');die;
+
+		$fp = fopen('file.csv', 'w');
+
+		foreach ($final[0] as $fields) {
+		 	# code...
+			fputcsv($fp, $fields);
+		}
+		fclose($fp);
+
+		echo "<pre>";
+		var_dump($final, 'have fun');
 	}
 
 
