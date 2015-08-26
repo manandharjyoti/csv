@@ -11,6 +11,10 @@ class InMemoryDataSet implements IDataSet {
 		$this->_data = $data;
 	}
 
+	public function getData(){
+		return $this->_data;
+	}
+
 	public function getName(){
 		return $this->_data[0];
 	}
@@ -35,6 +39,11 @@ class InMemoryDataSet implements IDataSet {
 function CSVToDataSet($file) {
 	return new InMemoryDataSet(array_map('str_getcsv', file($file)));
 }
+
+$awardsCSV = CSVToDataSet("awards.csv");
+$contractsCSV = CSVToDataSet("contracts.csv");
+
+
 
 // class DataQuery {
 // 	private $_dataSet;
@@ -76,7 +85,6 @@ class Merge
 
 	public function merge($a, $b)
 	{
-		var_dump($a);
 		$keys = array_keys($a);
 		foreach ($keys as $key) {
 			$final[] = array_merge($a[$key], $b[$key]);
@@ -91,7 +99,7 @@ class Merge
 
 		$fp = fopen('file.csv', 'w');
 
-		foreach ($final[0] as $fields) {
+		foreach ($final as $fields) {
 		 	# code...
 			fputcsv($fp, $fields);
 		}
@@ -105,12 +113,10 @@ class Merge
 
 }
 
-$awardsCSV = (array)CSVToDataSet("awards.csv");
-$contractsCSV = (array)CSVToDataSet("contracts.csv");
+
 
 // $awards = new DataQuery($awardsCSV);
 // $contracts = new DataQuery($contractsCSV);
-$output = new Merge($awardsCSV, $contractsCSV);
-$dupes = $output->merge($awardsCSV, $contractsCSV);
+$output = new Merge($awardsCSV->getData(), $contractsCSV->getData());
+ $dupes = $output->merge($awardsCSV->getData(), $contractsCSV->getData());
 
-var_dump($dupes);
