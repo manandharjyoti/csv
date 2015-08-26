@@ -42,9 +42,10 @@ class Merge
 
 	public function merge()
 	{
-		$final= array_merge_recursive($this->awards, $this->contracts);
+		$final = array_merge($this->awards, $this->contracts);
 		
 		$fp = fopen('file.csv', 'w');
+		fputcsv($fp, array_keys($final[4]));
 
 		foreach ($final as $fields) {
 		 	# code...
