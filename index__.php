@@ -14,24 +14,8 @@ class CSVArray {
 		$this->_data = $csv;
 	}
 
-	public function getTotalAmount(){
-		$amount = 0;
-		foreach ($this->_data as $key => $value) {
-			if($this->_data[$key]['status'] == "Closed")
-				$amount += $this->_data[$key]['Amount'];
-			# code...
-		}
-		return $amount;
-	}
-
-	public function changeKey(){
-		$result = array();
-		foreach($this->_data as $key=>$value)
-		{
-			$result[$value['contractname']] = $value;
-		}
-
-		return $result;
+	public function getData(){
+		return $this->_data;
 	}
 }
 
@@ -50,19 +34,17 @@ class Merge
 	{
 		echo '<pre>';
 		$final = (array_merge($this->awards, $this->contracts));
-
 		foreach($final as $key=>$item)
-		{	
-			$k = $key;
+		{
 			$final[$key]['contractDate'] = (isset($this->awards[$key]['contractDate']))?$this->awards[$key]['contractDate']:'';
 			$final[$key]['completionDate'] = (isset($this->awards[$key]['completionDate']))?$this->awards[$key]['completionDate']:'';
 			$final[$key]['awardee'] = (isset($this->awards[$key]['awardee']))?$this->awards[$key]['awardee']:'';
 			$final[$key]['awardeeLocation'] = (isset($this->awards[$key]['awardeeLocation']))?$this->awards[$key]['awardeeLocation']:'';
 			$final[$key]['Amount'] = (isset($this->awards[$key]['Amount']))?$this->awards[$key]['Amount']:'';
 		}
+		
 		$fp = fopen('file.csv', 'w');
-
-		fputcsv($fp, array_keys($final[$k]));
+		//fputcsv($fp, array_keys($final_array[0]));
 
 		foreach ($final as $fields) {
 		 	# code...
@@ -70,8 +52,8 @@ class Merge
 		}
 		fclose($fp);
 
-		return 'file.csv';
-
+		echo "<pre>";
+		var_dump($final, 'have fun');
 	}
 }
 
@@ -82,18 +64,21 @@ function CSVToArray($file) {
 $awardsCSV = CSVToArray("awards.csv");
 $contractsCSV = CSVToArray("contracts.csv");
 
-$awards = $awardsCSV->changeKey();
-$contracts = $contractsCSV->changeKey();
+$awards = array();
+$contracts = array();
+foreach($awardsCSV->getData() as $key=>$value)
+{
+	$awards[$value['contractname']] = $value;
+}
+
+foreach($contractsCSV->getData() as $key=>$value)
+{
+	$contracts[$value['contractname']] = $value;
+}
 
 unset($awardsCSV);
 unset($contractsCSV);
 
 $output = new Merge($awards, $contracts);
 
-$file = $output->merge();
-$finalCSV = CSVToArray($file);
-
-echo "Total Amount of Closed Contracts: ",$finalCSV->getTotalAmount();
-
-
-
+$dupes = $output->merge();
