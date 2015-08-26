@@ -33,6 +33,8 @@ class CSVArray {
 
 		return $result;
 	}
+
+	
 }
 
 class Merge 
@@ -48,7 +50,6 @@ class Merge
 
 	public function merge()
 	{
-		echo '<pre>';
 		$final = (array_merge($this->awards, $this->contracts));
 
 		foreach($final as $key=>$item)
@@ -58,6 +59,7 @@ class Merge
 			$final[$key]['completionDate'] = (isset($this->awards[$key]['completionDate']))?$this->awards[$key]['completionDate']:'';
 			$final[$key]['awardee'] = (isset($this->awards[$key]['awardee']))?$this->awards[$key]['awardee']:'';
 			$final[$key]['awardeeLocation'] = (isset($this->awards[$key]['awardeeLocation']))?$this->awards[$key]['awardeeLocation']:'';
+			$final[$key]['latlon'] = "";
 			$final[$key]['Amount'] = (isset($this->awards[$key]['Amount']))?$this->awards[$key]['Amount']:'';
 		}
 		$fp = fopen('file.csv', 'w');
@@ -94,6 +96,11 @@ $file = $output->merge();
 $finalCSV = CSVToArray($file);
 
 echo "Total Amount of Closed Contracts: ",$finalCSV->getTotalAmount();
+$geocode=file_get_contents("http://maps.google.com/maps/api/geocode/json?address=kathmandu&sensor=false");
+$output= json_decode($geocode);
+
+$lat = $output->results[0]->geometry->location->lat;
+$lng = $output->results[0]->geometry->location->lng;
 
 
 
