@@ -19,16 +19,6 @@ class CSVArray {
 	}
 }
 
-function CSVToArray($file) {
-	return new CSVArray(array_map('str_getcsv', file($file)));
-}
-
-$awardsCSV = CSVToArray("awards.csv");
-$contractsCSV = CSVToArray("contracts.csv");
-
-/**
-*  
-*/
 class Merge 
 {
 	private $awards;
@@ -42,10 +32,12 @@ class Merge
 
 	public function merge()
 	{
-		$final = array_merge($this->awards, $this->contracts);
+		
+		$final = (array_merge($this->awards, $this->contracts));
+		//$final = array_intersect($this->awards, $this->contracts);
 		
 		$fp = fopen('file.csv', 'w');
-		fputcsv($fp, array_keys($final[4]));
+		//fputcsv($fp, array_keys($final[4]));
 
 		foreach ($final as $fields) {
 		 	# code...
@@ -59,6 +51,13 @@ class Merge
 }
 
 
+function CSVToArray($file) {
+	return new CSVArray(array_map('str_getcsv', file($file)));
+}
+
+$awardsCSV = CSVToArray("awards.csv");
+$contractsCSV = CSVToArray("contracts.csv");
+
 $output = new Merge($awardsCSV->getData(), $contractsCSV->getData());
 
-$dupes = $output->merge($awardsCSV->getData(), $contractsCSV->getData());
+$dupes = $output->merge();
