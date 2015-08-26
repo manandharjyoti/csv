@@ -1,102 +1,49 @@
 <?php
-interface IDataSet {
-	public function getRowCount();
-	public function getValueAt($row, $column);
-}
 
-class InMemoryDataSet implements IDataSet {
+class CSVArray {
 	private $_data = array();
 
 	public function __construct(array $data) {
-		$this->_data = $data;
+		//makes the first row of csv as index of array
+		$header = array_shift($data);
+		$csv = array();
+		foreach ($data as $row) {
+			$csv[] = array_combine($header, $row);
+		}
+
+		$this->_data = $csv;
 	}
 
 	public function getData(){
 		return $this->_data;
 	}
-
-	public function getName(){
-		return $this->_data[0];
-	}
-
-	public function getRowCount() {
-		return count($this->_data);
-	}
-
-
-
-	public function getValueAt($row, $column) {
-		if ($row >= $this->getRowCount()) {
-			throw new OutOfRangeException();
-		}
-
-		return isset($this->_data[$row][$column])
-		? $this->_data[$row][$column]
-		: null;
-	}
 }
 
-function CSVToDataSet($file) {
-	return new InMemoryDataSet(array_map('str_getcsv', file($file)));
+function CSVToArray($file) {
+	return new CSVArray(array_map('str_getcsv', file($file)));
 }
 
-$awardsCSV = CSVToDataSet("awards.csv");
-$contractsCSV = CSVToDataSet("contracts.csv");
-
-
-
-// class DataQuery {
-// 	private $_dataSet;
-
-// 	public function __construct(IDataSet $dataSet) {
-// 		$this->_dataSet = $dataSet;
-
-// 	}
-
-// 	public function getRowsWithDuplicates($columnIndex) {
-// 		$values = array();
-// 		for ($i = 0; $i < $this->_dataSet->getRowCount(); ++$i) {
-// 			$values[$this->_dataSet->getValueAt($i, $columnIndex)][] = $i;
-// 		}
-
-// 		return array_filter($values, function($row) { return count($row) > 1; });
-// 	}
-// }
+$awardsCSV = CSVToArray("awards.csv");
+$contractsCSV = CSVToArray("contracts.csv");
 
 /**
 *  
 */
 class Merge 
 {
-	private $obj_a;
-	private $obj_b;
+	private $awards;
+	private $contracts;
 	
-	public function __construct($obj_a, $obj_b)
+	public function __construct($awards, $contracts)
 	{
-		$this->obj_a = $obj_a;
-		$this->obj_b = $obj_b;
+		$this->awards = $awards;
+		$this->contracts = $contracts;
 	}
 
-	public function getName()
+	public function merge()
 	{
-		return $this->obj_a->getName();
-		//var_dump($output);die('here');
-	}
-
-	public function merge($a, $b)
-	{
-		$keys = array_keys($a);
-		foreach ($keys as $key) {
-			$final[] = array_merge($a[$key], $b[$key]);
-			# code...
-		}
-
-		// // echo "<pre>";
-		// // var_dump($this->obj_a);
-		// // var_dump($this->obj_b);
-		// $merged = array_merge($a, $b);
-
-
+		$final= array_merge_recursive($this->awards, $this->contracts);
+		
 		$fp = fopen('file.csv', 'w');
 
 		foreach ($final as $fields) {
@@ -108,15 +55,9 @@ class Merge
 		echo "<pre>";
 		var_dump($final, 'have fun');
 	}
-
-
-
 }
 
 
-
-// $awards = new DataQuery($awardsCSV);
-// $contracts = new DataQuery($contractsCSV);
 $output = new Merge($awardsCSV->getData(), $contractsCSV->getData());
- $dupes = $output->merge($awardsCSV->getData(), $contractsCSV->getData());
 
+$dupes = $output->merge($awardsCSV->getData(), $contractsCSV->getData());
