@@ -1,10 +1,11 @@
 <?php
 
+
 class CSVArray {
 	private $_data = array();
 
 	public function __construct(array $data) {
-		// //makes the first row of csv as index of array
+
 		$header = array_shift($data);
 		$csv = array();
 		foreach ($data as $row) {
@@ -24,7 +25,6 @@ class CSVArray {
 		return $amount;
 	}
 
-	
 
 	public function changeKey(){
 		$result = array();
@@ -50,6 +50,7 @@ class Merge
 		$this->contracts = $contracts;
 	}
 
+
 	private function geoLocation($address)
 	{
 		$geocode=file_get_contents("http://maps.google.com/maps/api/geocode/json?address=".$address."&sensor=false");
@@ -67,10 +68,10 @@ class Merge
 		return $geo;
 	}
 
+
 	public function merge()
 	{
 		$final = (array_merge($this->awards, $this->contracts));
-
 
 
 		foreach($final as $key=>$item)
@@ -79,7 +80,8 @@ class Merge
 			$final[$key]['contractDate'] = (isset($this->awards[$key]['contractDate']))?$this->awards[$key]['contractDate']:'';
 			$final[$key]['completionDate'] = (isset($this->awards[$key]['completionDate']))?$this->awards[$key]['completionDate']:'';
 			$final[$key]['awardee'] = (isset($this->awards[$key]['awardee']))?$this->awards[$key]['awardee']:'';
-			$final[$key]['awardeeLocation'] = (isset($this->awards[$key]['awardeeLocation']))?$this->awards[$key]['awardeeLocation']:'';
+			$final[$key]['awardeeLocation'] = (isset($this->awards[$key]['awardeeLocation']))?$this->awards[$key]['awardeeLocation'].',nepal':'';
+
 			$final[$key]['latlon'] = $this->geoLocation($final[$key]['awardeeLocation']);
 			$final[$key]['Amount'] = (isset($this->awards[$key]['Amount']))?$this->awards[$key]['Amount']:'';
 		}
@@ -87,6 +89,7 @@ class Merge
 		$fp = fopen('file.csv', 'w');
 
 		fputcsv($fp, array_keys($final[$k]));//heder
+
 
 		foreach ($final as $fields) {
 		 	# code...
@@ -120,7 +123,4 @@ $file = $output->merge();
 $finalCSV = CSVToArray($file);
 
 echo "Total Amount of Closed Contracts: ",$finalCSV->getTotalAmount();
-
-
-
 
